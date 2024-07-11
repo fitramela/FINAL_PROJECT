@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Text,
   View,
@@ -16,7 +16,8 @@ import axiosInstance from "../axios instance/axios";
 function Home({ navigation }) {
   const [categories, setCategories] = useState([]);
   const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
-  const translateX = useRef(new Animated.Value(0)).current;
+  const translateX = useState(new Animated.Value(0))[0];
+  const windowWidth = Dimensions.get("window").width;
 
   useEffect(() => {
     Categories();
@@ -27,7 +28,7 @@ function Home({ navigation }) {
       setCurrentBannerIndex((prevIndex) => {
         const nextIndex = (prevIndex + 1) % banners.length;
         Animated.spring(translateX, {
-          toValue: -nextIndex * Dimensions.get("window").width,
+          toValue: -nextIndex * windowWidth,
           useNativeDriver: true,
         }).start();
         return nextIndex;
@@ -35,7 +36,7 @@ function Home({ navigation }) {
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [translateX]);
+  }, []);
 
   async function Categories() {
     try {
@@ -49,36 +50,28 @@ function Home({ navigation }) {
   const banners = [
     "https://images.pexels.com/photos/863988/pexels-photo-863988.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
     "https://images.pexels.com/photos/248547/pexels-photo-248547.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-    "https://images.pexels.com/photos/841130/pexels-photo-841130.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+    "https://images.pexels.com/photos/841130/pexels-photo-841130.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
   ];
 
   const renderCard = ({ item }) => (
+    <View>
+
     <TouchableOpacity
       key={item.id}
       style={styles.card}
       onPress={() => navigation.navigate("Event", { card: item })}
-    >
+      >
       <Image source={{ uri: item.image }} style={styles.cardImage} />
       <View style={styles.cardContent}>
         <Text style={styles.cardTitle}>{item.name}</Text>
         <Text style={styles.cardDescription}>{item.description}</Text>
       </View>
     </TouchableOpacity>
+      </View>
   );
 
-  const renderBanners = () => (
-    <Animated.View
-      style={[
-        styles.bannerContainer,
-        {
-          transform: [{ translateX }],
-        },
-      ]}
-    >
-      {banners.map((banner, index) => (
-        <Image key={index} source={{ uri: banner }} style={styles.banner} />
-      ))}
-    </Animated.View>
+  const renderBanner = ({ item, index }) => (
+    <Image key={index} source={{ uri: item }} style={[styles.banner, { width: windowWidth }]} />
   );
 
   return (
@@ -93,12 +86,16 @@ function Home({ navigation }) {
       <FlatList
         data={categories}
         renderItem={renderCard}
-        keyExtractor={(item) => item.id}
+        // keyExtractor={(item) => item.id}
         numColumns={2}
         columnWrapperStyle={styles.row}
         contentContainerStyle={styles.cardsContainer}
       />
-      <View style={styles.bannersWrapper}>{renderBanners()}</View>
+      <View style={styles.bannerContainer}>
+        <Animated.View style={[styles.bannerWrapper, { transform: [{ translateX }] }]}>
+          {banners.map((banner, index) => renderBanner({ item: banner, index }))}
+        </Animated.View>
+      </View>
     </ScrollView>
   );
 }
@@ -162,24 +159,18 @@ const styles = StyleSheet.create({
     color: "#666",
     marginTop: 5,
   },
-  bannersWrapper: {
-    overflow: "hidden",
-  },
   bannerContainer: {
+    overflow: "hidden",
+    height: 100,
+    marginBottom: 20,
+  },
+  bannerWrapper: {
     flexDirection: "row",
-    width: Dimensions.get("window").width * 3, // Adjust based on the number of banners
   },
   banner: {
-    width: Dimensions.get("window").width,
-    height: 120,
+    height: 100,
     borderRadius: 8,
     marginBottom: 20,
-    marginRight: 10,
-    shadowColor: "#000",
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 2,
-    
   },
   centeredView: {
     flex: 1,

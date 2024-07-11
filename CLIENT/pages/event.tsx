@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, Image, FlatList, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Image, FlatList, Dimensions, TouchableOpacity } from 'react-native';
 import axiosInstance from '../axios instance/axios';
 
-function Event({ route }) {
+function Event({ route ,navigation}) {
   const { card } = route.params;
   // console.log(card ,'<---carddd')
   const [event , setEvent] = React.useState([])
@@ -32,11 +32,14 @@ useEffect(()=>{
         keyExtractor={(item) => item._id.toString()}
         numColumns={2}
         renderItem={({ item }) => (
-          <View style={styles.pinterestCard}>
+          <TouchableOpacity style={styles.pinterestCard}
+          key={item.id}
+          onPress={() => navigation.navigate("Detail Event", { card: item })}
+          >
             <Image source={{ uri: item.imageLocation }} style={styles.pinterestImage} />
             <Text style={styles.pinterestTitle}>{item.name}</Text>
             <Text style={styles.pinterestCategory}>{item.category}</Text>
-          </View>
+          </TouchableOpacity>
         )}
       />
     </View>

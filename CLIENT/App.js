@@ -4,6 +4,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import TabNavigator from './pages/tabnavigator';
 import Event from './pages/event';
+import DetailEvent from './pages/detailEvent';
 
 const Stack = createNativeStackNavigator();
 
@@ -14,6 +15,7 @@ export default function App() {
       <Stack.Navigator>
         <Stack.Screen name="HOME" component={TabNavigator} options={{ headerShown: false }} />
         <Stack.Screen name="Event" component={Event} options={{ headerShown: true }} />
+        <Stack.Screen name="Detail Event" component={DetailEvent} options={{ headerShown: true }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
